@@ -17,7 +17,7 @@ from tidal_analysis import *
 @pytest.fixture
 def data_dir():
     # Anchors to the folder where this test file sits
-    return Path(__file__).parent / "data"
+    return Path(__file__).parent / os.pardir / "data"
 
 @pytest.fixture
 def main_dir():
@@ -198,7 +198,7 @@ class TestRegression():
         with redirect_stdout(f):
             main(args_list = args)
         output = f.getvalue()
-        assert len(output) > 25
+        assert len(output) > 50
 
     def test_aberdeen_regression(self, main_dir):
 
@@ -208,10 +208,11 @@ class TestRegression():
         with redirect_stdout(f):
             main(args_list = args)
         output = f.getvalue()
-        assert len(output) > 25
+        assert len(output) > 50
 
     def test_dover_regression(self, main_dir):
         # no verbose output, so nothing should be output to screen
+        # the help might have to contain where the output goes in that case, perhaps?
         args = [os.path.join(main_dir,"dover")]
         f = io.StringIO() 
         with redirect_stdout(f):
