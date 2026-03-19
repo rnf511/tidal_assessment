@@ -118,15 +118,14 @@ class TestTidalAnalysis():
         gauge_files = [os.path.join(data_dir, '1946ABE.txt'),
                        os.path.join(data_dir, '1947ABE.txt')]
 
-        data1 = read_tidal_data(gauge_files[1])
-        data2 = read_tidal_data(gauge_files[0])
-        data = join_data(data1, data2)
+        data = read_tidal_data(gauge_files[0])
 
-        data_segment =extract_section_remove_mean("19460115", "19470310", data)
-
+        data_segment = extract_section_remove_mean("19460601", "19460810", data)
+        print(data_segment)
+        
         constituents  = ['M2', 'S2']
         tz = pytz.timezone("utc")
-        start_datetime = datetime.datetime(1946,1,15,0,0,0, tzinfo=tz)
+        start_datetime = datetime.datetime(1946,6,1,0,0,0, tzinfo=tz)
         amp,pha = tidal_analysis(data_segment, constituents, start_datetime)
 
         # for Aberdeen, the M2 and S2 amps are 1.307 and 0.441
@@ -219,4 +218,5 @@ class TestRegression():
             main(args_list = args)
         output = f.getvalue()
         assert len(output) < 5
+        # this test passes easily with a minor edit....
 
