@@ -58,8 +58,31 @@ def read_tidal_data(filename):
 
     
 def extract_single_year_remove_mean(year, data):
-
-    return 
+    
+    # Check required column exists
+    if "Sea Level" not in data.columns:
+        raise ValueError("Data must contain a 'Sea Level' column.")
+      
+    # Convert year to string for indexing
+    year = str(year)
+       
+      
+    # Select only rows from the requested year
+    year_data = data.loc[year].copy()
+    print("hello", year_data)
+      
+    # If the year exists but contains no rows
+    if year_data.empty:
+        raise ValueError(f"No data found for year {year}.")
+      
+    # Calculate the mean, ignoring NaN values
+    mean_sea_level = year_data["Sea Level"].mean()
+      
+    # Subtract the mean from all sea-level values
+    year_data["Sea Level"] = year_data["Sea Level"] - mean_sea_level
+      
+    return #year_data
+ 
 
 
 def extract_section_remove_mean(start, end, data):
