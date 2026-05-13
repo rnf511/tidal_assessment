@@ -10,9 +10,9 @@ from scipy import stats
 import matplotlib.dates as mdates
 import argparse
 
-#hello
-#its milly 
-#test
+print ("hello")
+
+
 
 def read_tidal_data(filename):
 
