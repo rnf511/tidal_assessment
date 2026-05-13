@@ -14,12 +14,12 @@ import argparse
 
 def read_tidal_data(filename):
     
-    # Check if the file exists
+    # reads data, replaces values containing M, N and T, and sorts data
+   
     if not os.path.exists(filename):
         raise FileNotFoundError(f"{filename} not found")
 
-    # Read the file's data
-    # print(f"Reading data from {filename}...")
+
     data = pd.read_csv(
         filename,
         sep=r"\s+",
@@ -28,25 +28,19 @@ def read_tidal_data(filename):
         engine="python")
 
     # Combine the date and time columns into datetime
-    # print("Processing data...")
-    data['Datetime'] = pd.to_datetime(data['Date'] + ' ' + data['Time'])
-    # print(f"Data read successfully.")
 
-    # Set datetime as index
+    data['Datetime'] = pd.to_datetime(data['Date'] + ' ' + data['Time'])
+
+
     data.set_index('Datetime', inplace=True)
 
-    # Replace M, N, T values with NaN
-    # print(f"Replacing M, N, T values with NaN.")
     data.replace(
         to_replace=".*[MNT]$",
         value={'Sea Level': np.nan},
         regex=True,
         inplace=True)
     
-    # print row 35 to test replacement
-    # print(f"Row 35 after replacement: {data.iloc[34]}")
 
-    # Convert Sea Level column to float
     data['Sea Level'] = pd.to_numeric(
         data['Sea Level'],
         errors='coerce')
@@ -59,29 +53,28 @@ def read_tidal_data(filename):
     
 def extract_single_year_remove_mean(year, data):
     
-    # Check required column exists
+    #extracts data for a specific year and centers the sea level measurements 
+    #around a mean
+    
+    # Check Sea Level column exists
     if "Sea Level" not in data.columns:
         raise ValueError("Data must contain a 'Sea Level' column.")
       
-    # Convert year to string for indexing
+  
     year = str(year)
-       
-      
-    # Select only rows from the requested year
     year_data = data.loc[year].copy()
-    print("hello", year_data)
       
-    # If the year exists but contains no rows
+
     if year_data.empty:
         raise ValueError(f"No data found for year {year}.")
-      
-    # Calculate the mean, ignoring NaN values
+     
+   
     mean_sea_level = year_data["Sea Level"].mean()
       
-    # Subtract the mean from all sea-level values
+ 
     year_data["Sea Level"] = year_data["Sea Level"] - mean_sea_level
       
-    return #year_data
+    return year_data
  
 
 
@@ -92,8 +85,8 @@ def extract_section_remove_mean(start, end, data):
 
 def join_data(data1, data2):
     
-   
-    # Check that both DFs contain the sea level column
+   #Concatenates/merges the 2 tidal datasets, and orders them chronologically by datetime
+    
     if "Sea Level" not in data1.columns or "Sea Level" not in data2.columns:
         return None
         raise ValueError("Both DataFrames must contain a 'Sea Level' column.")
@@ -101,7 +94,7 @@ def join_data(data1, data2):
     # Merge the two DFs
     data = pd.concat([data1, data2])
 
-    # Sort by the Datetime index
+    
     data.sort_index(inplace=True)
 
     return data
