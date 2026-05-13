@@ -19,7 +19,7 @@ def read_tidal_data(filename):
         raise FileNotFoundError(f"{filename} not found")
 
     # Read the file's data
-    print(f"Reading data from {filename}...")
+    # print(f"Reading data from {filename}...")
     data = pd.read_csv(
         filename,
         sep=r"\s+",
@@ -28,15 +28,15 @@ def read_tidal_data(filename):
         engine="python")
 
     # Combine the date and time columns into datetime
-    print("Processing data...")
+    # print("Processing data...")
     data['Datetime'] = pd.to_datetime(data['Date'] + ' ' + data['Time'])
-    print(f"Data read successfully.")
+    # print(f"Data read successfully.")
 
     # Set datetime as index
     data.set_index('Datetime', inplace=True)
 
     # Replace M, N, T values with NaN
-    print(f"Replacing M, N, T values with NaN.")
+    # print(f"Replacing M, N, T values with NaN.")
     data.replace(
         to_replace=".*[MNT]$",
         value={'Sea Level': np.nan},
@@ -68,8 +68,22 @@ def extract_section_remove_mean(start, end, data):
 
 
 def join_data(data1, data2):
+    
+   
+    # Check that both DFs contain the sea level column
+    if "Sea Level" not in data1.columns or "Sea Level" not in data2.columns:
+        return None
+        raise ValueError("Both DataFrames must contain a 'Sea Level' column.")
 
-    return 
+    # Merge the two DFs
+    data = pd.concat([data1, data2])
+
+    # Sort by the Datetime index
+    data.sort_index(inplace=True)
+
+    return data
+
+ 
 
 def sea_level_rise(data):
 
