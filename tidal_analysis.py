@@ -10,13 +10,52 @@ from scipy import stats
 import matplotlib.dates as mdates
 import argparse
 
-print ("hello")
-
 
 
 def read_tidal_data(filename):
+    
+    # Check if the file exists
+    if not os.path.exists(filename):
+        raise FileNotFoundError(f"{filename} not found")
 
-    return
+    # Read the file's data
+    print(f"Reading data from {filename}...")
+    data = pd.read_csv(
+        filename,
+        sep=r"\s+",
+        skiprows=11,
+        names=["Cycle", "Date", "Time", "Sea Level", "Residual"],
+        engine="python")
+
+    # Combine the date and time columns into datetime
+    print("Processing data...")
+    data['Datetime'] = pd.to_datetime(data['Date'] + ' ' + data['Time'])
+    print(f"Data read successfully.")
+
+    # Set datetime as index
+    data.set_index('Datetime', inplace=True)
+
+    # Replace M, N, T values with NaN
+    print(f"Replacing M, N, T values with NaN.")
+    data.replace(
+        to_replace=".*[MNT]$",
+        value={'Sea Level': np.nan},
+        regex=True,
+        inplace=True)
+    
+    # print row 35 to test replacement
+    # print(f"Row 35 after replacement: {data.iloc[34]}")
+
+    # Convert Sea Level column to float
+    data['Sea Level'] = pd.to_numeric(
+        data['Sea Level'],
+        errors='coerce')
+    
+    # print(f"Row 350 to check float is correct: {data.iloc[349]}")
+
+    return data
+    
+
     
 def extract_single_year_remove_mean(year, data):
 
@@ -25,7 +64,7 @@ def extract_single_year_remove_mean(year, data):
 
 def extract_section_remove_mean(start, end, data):
 
-    return year_data
+    return #year_data
 
 
 def join_data(data1, data2):
