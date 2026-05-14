@@ -10,6 +10,7 @@ from scipy import stats
 import matplotlib.dates as mdates
 import argparse
 from utide import solve 
+from scipy.stats import linregress
 
 
 
@@ -84,6 +85,7 @@ def extract_section_remove_mean(start, end, data):
     # function extracts a specific date range from the data and centers the 
     # sea level data by subtracting the mean    
 
+
     start = pd.to_datetime(start, format="%Y%m%d")
     end = pd.to_datetime(end, format="%Y%m%d") + pd.Timedelta(hours=23)
     
@@ -115,7 +117,34 @@ def join_data(data1, data2):
 
 def sea_level_rise(data):
 
-    return
+# answer doesn not fit in range- extremely close though
+
+    # Remove rows where Sea Level is missing
+    clean_data = data.dropna(subset=["Sea Level"])
+
+ 
+    #gem suggestion
+    #start_date = clean_data.index[0].normalize()
+    
+    #t = (clean_data.index - start_date).total_seconds() / 86400.0
+    t = clean_data.index.map(pd.Timestamp.toordinal) 
+    
+    # Sea level values
+    y = clean_data["Sea Level"].to_numpy(dtype=float)
+
+    # Perform linear regression
+    result = linregress(t, y)
+
+    print(f"Number of rows in regression: {len(clean_data)}")
+# Does this number match what you expect for the date range?
+# For June 1 to Aug 10 (71 days), it should be approx 1704 rows.
+    print(result)
+
+
+    # select correct values from linregress
+    return result.slope, result.pvalue
+
+
 
 def tidal_analysis(data, constituents, start_datetime):
 
@@ -163,7 +192,7 @@ def tidal_analysis(data, constituents, start_datetime):
 
 
 
-def get_longest_contiguous_data(data):
+def get_longest_continuous_data(data):
 
     return 
 
