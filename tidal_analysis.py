@@ -9,6 +9,8 @@ import math
 from scipy import stats
 import matplotlib.dates as mdates
 import argparse
+from utide import solve 
+
 
 
 
@@ -95,7 +97,7 @@ def extract_section_remove_mean(start, end, data):
 
 def join_data(data1, data2):
     
-   #Concatenates/merges the 2 tidal datasets, and orders them chronologically by datetime
+   # function concatenates (merges) the 2 tidal datasets, and orders them chronologically by datetime
     
     if "Sea Level" not in data1.columns or "Sea Level" not in data2.columns:
         return None
@@ -117,7 +119,51 @@ def sea_level_rise(data):
 
 def tidal_analysis(data, constituents, start_datetime):
 
-    return
+
+    print(f"Tidal analysis start")
+
+    start_datetime = start_datetime.replace(tzinfo=None)
+    print(f"Time start: {start_datetime}")
+
+    time_Change = data.index - start_datetime
+
+    # Recreate absolute datetimes using start_datetime
+    time = start_datetime + time_Change
+
+    # Sea level values
+    sea_level = data["Sea Level"].values
+
+    # Remove NaNs
+    mask = ~np.isnan(sea_level)
+
+    time = time[mask]
+    sea_level = sea_level[mask]
+
+    # Perform harmonic analysis
+    coef = solve(
+        time,
+        sea_level,
+        lat=57.14325,          # Aberdeen latitude
+        constit=constituents,
+        method="ols",
+        trend=False,
+        verbose=False
+    )
+
+    # Extract amplitudes and phases
+    amp = coef.A
+    pha = coef.g
+
+    print(f"Amplitudes: {amp}, Phases: {pha}")
+
+    return amp, pha
+
+
+       
+
+
+
+
 
 def get_longest_contiguous_data(data):
 
