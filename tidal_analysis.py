@@ -14,7 +14,7 @@ import argparse
 
 def read_tidal_data(filename):
     
-    # reads data, replaces values containing M, N and T, and sorts data
+    # function reads data, replaces values containing M, N and T, and sorts data
    
     if not os.path.exists(filename):
         raise FileNotFoundError(f"{filename} not found")
@@ -45,7 +45,6 @@ def read_tidal_data(filename):
         data['Sea Level'],
         errors='coerce')
     
-    # print(f"Row 350 to check float is correct: {data.iloc[349]}")
 
     return data
     
@@ -53,8 +52,8 @@ def read_tidal_data(filename):
     
 def extract_single_year_remove_mean(year, data):
     
-    #extracts data for a specific year and centers the sea level measurements 
-    #around a mean
+    # function extracts data for a specific year and centers the sea level measurements 
+    # around a mean
     
     # Check Sea Level column exists
     if "Sea Level" not in data.columns:
@@ -80,7 +79,22 @@ def extract_single_year_remove_mean(year, data):
 
 def extract_section_remove_mean(start, end, data):
 
-    return #year_data
+    
+    
+    #format data 
+    start = pd.to_datetime(start, format="%Y%m%d")
+    end = pd.to_datetime(end, format="%Y%m%d") + pd.Timedelta(hours=23)
+
+    
+    year_data = data.loc[start:end].copy()
+    
+    #remove mean
+    year_data["Sea Level"] = year_data["Sea Level"] - year_data["Sea Level"].mean()
+
+
+    return year_data
+
+    
 
 
 def join_data(data1, data2):
