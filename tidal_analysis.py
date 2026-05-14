@@ -119,18 +119,17 @@ def sea_level_rise(data):
 
 def tidal_analysis(data, constituents, start_datetime):
 
-
-    print(f"Tidal analysis start")
-
+    # function performs tidal analysis using Ordinary Least Squares (OLS) to 
+    # determine the amplitude and phase of specified tidal constituents
+    
     start_datetime = start_datetime.replace(tzinfo=None)
-    print(f"Time start: {start_datetime}")
 
     time_Change = data.index - start_datetime
 
-    # Recreate absolute datetimes using start_datetime
+   
     time = start_datetime + time_Change
 
-    # Sea level values
+
     sea_level = data["Sea Level"].values
 
     # Remove NaNs
@@ -139,11 +138,11 @@ def tidal_analysis(data, constituents, start_datetime):
     time = time[mask]
     sea_level = sea_level[mask]
 
-    # Perform harmonic analysis
+   
     coef = solve(
         time,
         sea_level,
-        lat=57.14325,          # Aberdeen latitude
+        lat=57.14325,         
         constit=constituents,
         method="ols",
         trend=False,
@@ -154,7 +153,6 @@ def tidal_analysis(data, constituents, start_datetime):
     amp = coef.A
     pha = coef.g
 
-    print(f"Amplitudes: {amp}, Phases: {pha}")
 
     return amp, pha
 
