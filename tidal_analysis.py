@@ -45,7 +45,6 @@ def read_tidal_data(filename):
         data['Sea Level'],
         errors='coerce')
     
-    # print(f"Row 350 to check float is correct: {data.iloc[349]}")
 
     return data
     
@@ -80,7 +79,18 @@ def extract_single_year_remove_mean(year, data):
 
 def extract_section_remove_mean(start, end, data):
 
-    return #year_data
+    # function extracts a specific date range from the data and centers the 
+    # sea level data by subtracting the mean    
+
+    start = pd.to_datetime(start, format="%Y%m%d")
+    end = pd.to_datetime(end, format="%Y%m%d") + pd.Timedelta(hours=23)
+    
+
+    year_data = data.loc[start:end].copy()
+    year_data["Sea Level"] = year_data["Sea Level"] - year_data["Sea Level"].mean()
+    
+
+    return year_data
 
 
 def join_data(data1, data2):
@@ -92,12 +102,12 @@ def join_data(data1, data2):
         raise ValueError("Both DataFrames must contain a 'Sea Level' column.")
 
     # Merge the two DFs
-    data = pd.concat([data1, data2])
+    year_data = pd.concat([data1, data2])
 
     
-    data.sort_index(inplace=True)
+    year_data.sort_index(inplace=True)
 
-    return data
+    return year_data
 
  
 
